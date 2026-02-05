@@ -1,6 +1,8 @@
 import click
 import shutil
 import uuid
+import os
+import fnmatch
 from pathlib import Path
 
 @click.group()
@@ -131,13 +133,95 @@ def commit(message):
         click.echo(f"Commit failed: {e}")
 
 
+def get_staged_files():
+    """סורק את תיקיית ה-staging ומחזיר רשימת נתיבים מנורמלים"""
+    staging_dir = Path.cwd() / ".wit" / "staging"
+    if not staging_dir.exists():
+        return set()
+    # אנחנו הופכים כל נתיב למחרוזת בפורמט POSIX (עם לוכסן /)
+    return {p.relative_to(staging_dir).as_posix() for p in staging_dir.rglob('*') if p.is_file()}
+
+def get_last_commit_files():
+    """מחזירה סט של קבצים בקומיט האחרון עם נתיבים מנורמלים"""
+    wit_dir = Path.cwd() / ".wit"
+    ref_path = wit_dir / "references.txt"
+    if not ref_path.exists():
+        return set()
+
+    with open(ref_path, "r") as f:
+        head_id = f.read().split("=")[1].strip()
+
+    commit_dir = wit_dir / "repository" / head_id
+    return {p.relative_to(commit_dir).as_posix() for p in commit_dir.rglob('*') if
+            p.is_file() and p.name != "metadata.txt"}
+
+def is_ignored(path_obj):
+    # רשימת קבצים ותיקיות שנתעלם מהם תמיד
+    ignored_names = {'.wit', '.venv', '.git', '.idea', 'wit.py', 'wit.bat', '.witignore'}
+    return any(part in ignored_names for part in path_obj.parts)
 
 
+@cli.command()
+def status():
+    """מציג את מצב הקבצים: Staged, Modified ו-Untracked"""
+    wit_dir = Path.cwd() / ".wit"
+    if not wit_dir.exists():
+        click.echo("Not a wit repository.")
+        return
 
+    # 1. השגת רשימות קבצים ונרמול נתיבים (as_posix)
+    # -------------------------------------------
+    staged_files = {Path(f).as_posix() for f in get_staged_files()}
+    last_commit_files = {Path(f).as_posix() for f in get_last_commit_files()}
 
+    # זיהוי קבצים בתיקיית העבודה (Working Directory)
+    working_dir_files = set()
+    for p in Path.cwd().rglob('*'):
+        if ".wit" in p.parts or p.is_dir() or is_ignored(p):
+            continue
+        working_dir_files.add(p.relative_to(Path.cwd()).as_posix())
 
+    # 2. חישוב הקטגוריות (לוגיקה של קבוצות)
+    # ------------------------------------
 
+    # א. Changes to be committed: קבצים ב-Staging ששונים מהקומיט האחרון
+    # זה התיקון הקריטי - אם הקובץ זהה לקומיט האחרון, הוא לא יופיע כאן
+    to_be_committed = staged_files - last_commit_files
 
+    # ב. Changes not staged for commit: קבצים עוקבים שנמחקו פיזית
+    tracked_files = staged_files | last_commit_files
+    deleted_files = {f for f in tracked_files if not (Path.cwd() / f).exists()}
+
+    # ג. Untracked files: קבצים בתיקייה שלא ב-Staging ולא בקומיט
+    untracked = working_dir_files - tracked_files
+
+    # 3. הדפסה למשתמש
+    # ---------------
+    click.echo(f"On branch master\n")
+
+    # הצגת קבצים להפקדה (ירוק)
+    click.echo("Changes to be committed:")
+    if to_be_committed:
+        for f in to_be_committed:
+            click.secho(f"\tnew file: {f}", fg="green")
+    else:
+        click.echo("\t(nothing staged)")
+
+        # הצגת שינויים שלא נוספו (אדום)
+        click.echo("\nChanges not staged for commit:")
+        if deleted_files:
+            for f in deleted_files:
+                click.secho(f"\tdeleted: {f}", fg="red")
+        else:
+            click.echo("\t(use 'wit add <file>...' to update what will be committed)")
+
+        # הצגת קבצים לא עוקבים (אדום)
+        click.echo("\nUntracked files:")
+        if untracked:
+            for f in untracked:
+                click.secho(f"\t{f}", fg="red")
+        else:
+            click.echo("\t(nothing untracked)")
 
 
 
