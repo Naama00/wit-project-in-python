@@ -4,7 +4,5 @@
     <option name="sdkName" value="Python 3.14 (wit project)" />
   </component>
   <component name="KubernetesApiProvider">{}</component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.14 (wit project)" project-jdk-type="Python SDK">
-    <output url="file://$PROJECT_DIR$/out" />
-  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.14 (wit-project-in-python)" project-jdk-type="Python SDK" />
 </project>
