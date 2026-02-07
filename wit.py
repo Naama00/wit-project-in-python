@@ -380,6 +380,6 @@ def log():
 
             click.echo(metadata)
             click.echo("-" * 25)
-            
+
 if __name__ == "__main__":
     cli()
