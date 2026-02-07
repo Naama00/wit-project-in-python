@@ -106,7 +106,6 @@ def commit(message):
         return
 
     # 2. השוואת Staging ל-HEAD (כדי לא לייצר קומיט זהה)
-    # ... (הלוגיקה של ה-Hash שכתבנו קודם) ...
     # אם אין שינויים, עוצרים פה.
 
     # 3. יצירת מזהה ייחודי לקומיט (Commit ID)
@@ -126,14 +125,11 @@ def commit(message):
         with open(wit_dir / "references.txt", "w", encoding="utf-8") as f:
             f.write(f"HEAD={commit_id}")
 
-        # --- התיקון: ניקוי ה-staging area לאחר קומיט מוצלח ---
         for item in staging_dir.iterdir():
             if item.is_file():
                 item.unlink()
             elif item.is_dir():
                 shutil.rmtree(item)
-        # --------------------------------------------------
-
         click.echo(f"Successfully created commit: {commit_id}")
         click.echo(f"Message: {message}")
 
@@ -146,7 +142,6 @@ def get_staged_files():
     staging_dir = Path.cwd() / ".wit" / "staging"
     if not staging_dir.exists():
         return set()
-    # אנחנו הופכים כל נתיב למחרוזת בפורמט POSIX (עם לוכסן /)
     return {p.relative_to(staging_dir).as_posix() for p in staging_dir.rglob('*') if p.is_file()}
 
 def get_last_commit_files():
@@ -338,5 +333,53 @@ def checkout(commit_id):
 
     except Exception as e:
         click.echo(f"Checkout failed: {e}")
+
+
+@cli.command()
+def log():
+    """מציג את היסטוריית הקומיטים במאגר"""
+    wit_dir = Path.cwd() / ".wit"
+    repo_dir = wit_dir / "repository"
+    ref_path = wit_dir / "references.txt"
+
+    if not repo_dir.exists():
+        click.echo("Error: No repository found.")
+        return
+
+    # השגת ה-HEAD הנוכחי כדי לסמן אותו למשתמש
+    current_head = ""
+    if ref_path.exists():
+        content = ref_path.read_text()
+        if "=" in content:
+            current_head = content.split("=")[1].strip()
+
+    click.echo("--- Wit Commit History ---")
+
+    # מעבר על כל התיקיות ב-repository (כל תיקייה היא קומיט)
+    commits = list(repo_dir.iterdir())
+
+    # מיון לפי זמן יצירה (מהחדש לישן)
+    commits.sort(key=lambda x: x.stat().st_ctime, reverse=True)
+
+    if not commits:
+        click.echo("No commits found yet.")
+        return
+
+    for commit_path in commits:
+        commit_id = commit_path.name
+        metadata_file = commit_path / "metadata.txt"
+
+        if metadata_file.exists():
+            metadata = metadata_file.read_text(encoding="utf-8")
+
+            # הדגשת הקומיט הנוכחי (HEAD)
+            if commit_id == current_head:
+                click.secho(f"Commit ID: {commit_id} (HEAD)", fg="cyan", bold=True)
+            else:
+                click.echo(f"Commit ID: {commit_id}")
+
+            click.echo(metadata)
+            click.echo("-" * 25)
+            
 if __name__ == "__main__":
     cli()
