@@ -243,7 +243,10 @@ class WitImplementation(WitInterface):
         return content.split("=")[1].strip()
 
     def _is_ignored(self, path_obj) -> bool:
-        ignored_names = {'.wit', '.venv', '.git', '.idea', '.DS_Store', '__pycache__'}
+        ignored_names = {
+            '.wit', '.venv', '.git', '.idea', '.DS_Store', '__pycache__',
+            'wit.py', 'wit_implementation.py', 'wit_interface.py', 'wit.bat', 'wit.sh'
+        }
         return any(part in ignored_names for part in path_obj.parts)
 
     def _get_file_hash(self, filepath) -> str:
