@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import click
 from wit_implementation import WitImplementation
 
