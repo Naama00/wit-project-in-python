@@ -1,6 +1,5 @@
 import click
-from wit_implementation import WitImplementation
-
+from wit_core import WitImplementation
 # יצירת אובייקט של המימוש
 wit_app = WitImplementation()
 
