@@ -5,16 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="87b8023a-87b6-43ba-b8fc-a47f87785593" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/wit-project-in-python.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wit_core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.witignore" beforeDir="false" afterPath="$PROJECT_DIR$/.witignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit.py" beforeDir="false" afterPath="$PROJECT_DIR$/wit_cli.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_implementation.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_interface.py" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
