@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="87b8023a-87b6-43ba-b8fc-a47f87785593" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.wit/references.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.wit/references.txt" beforeDir="false" afterPath="$PROJECT_DIR$/.wit/references.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/add.txt" beforeDir="false" afterPath="$PROJECT_DIR$/add.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

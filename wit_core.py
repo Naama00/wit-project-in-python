@@ -44,17 +44,22 @@ class WitImplementation(WitInterface):
             return f"Error: {e}"
 
     def add(self, path: str) -> str:
-        source = Path(path)
+        source = Path(path).absolute()  # שימוש בנתיב מלא למניעת בלבול
         if not self.wit_dir.exists(): return "Error: Run 'init' first."
         if not source.exists(): return f"Error: {path} not found."
 
+        # הגנה: לא להוסיף את תיקיית המערכת של wit או git לתוך ה-staging
+        if ".wit" in source.parts or ".git" in source.parts or ".venv" in source.parts:
+            return f"Skipping system directory: {source.name}"
+
         try:
+            # יצירת נתיב יעד בתוך staging ששומר על המבנה המקורי
+            destination = self.staging_dir / source.name
+
             if source.is_file():
-                WitUtils.copy_file(source, self.staging_dir / source.name)
+                WitUtils.copy_file(source, destination)
             elif source.is_dir():
-                # אנחנו לא מעתיקים את תיקיית .wit עצמה
-                if source.name == ".wit": return "Skipping .wit directory."
-                WitUtils.copy_directory(source, self.staging_dir / source.name)
+                WitUtils.copy_directory(source, destination)
             return f"Added {path} to staging."
         except Exception as e:
             return f"Failed to add: {e}"
