@@ -1,0 +1,2 @@
+[console_scripts]
+wit = wit_cli:cli

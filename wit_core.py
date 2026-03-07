@@ -1,11 +1,6 @@
 from utils import WitUtils
 from pathlib import Path
 from abc import ABC, abstractmethod
-
-
-# --- מחלקת עזר סטטית (לפי בקשת המורה) ---
-
-# --- ממשק המערכת ---
 class WitInterface(ABC):
     @abstractmethod
     def init(self): pass
