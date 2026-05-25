@@ -1,4 +1,4 @@
-from utils import WitUtils
+from wit.file_utils import WitUtils
 from pathlib import Path
 from abc import ABC, abstractmethod
 
@@ -136,3 +136,33 @@ class WitImplementation(WitInterface):
             return f"Successfully checked out to {commit_id}."
         except Exception as e:
             return f"Checkout failed: {e}"
+
+def push(self) -> str:
+    """
+    Sends all staged Python files to the CodeGuard server for analysis.
+    Returns a summary of issues and saves generated graphs locally.
+    """
+    import requests
+
+    staged_python_files = list(self.staging_dir.rglob("*.py"))
+    if not staged_python_files:
+        return "Nothing to push: no Python files in staging area."
+
+    server_url = self._read_server_url()   # קורא מ-.wit/config.txt
+
+    try:
+        files_payload = [
+            ("files", (f.name, f.read_bytes(), "text/x-python"))
+            for f in staged_python_files
+        ]
+        response = requests.post(f"{server_url}/analyze", files=files_payload, timeout=30)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        return f"Push failed: could not reach server at {server_url}. Error: {e}"
+
+    result = response.json()
+    # שמור גרפים לתיקייה מקומית
+    graphs_dir = Path.cwd() / "graphs"
+    graphs_dir.mkdir(exist_ok=True)
+    # ... הצגת תוצאות
+    return self._format_push_summary(result)

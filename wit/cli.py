@@ -1,5 +1,5 @@
 import click
-from wit_core import WitImplementation
+from wit.core import WitImplementation
 # יצירת אובייקט של המימוש
 wit_app = WitImplementation()
 
@@ -54,6 +54,10 @@ def log():
     """מציג את היסטוריית הקומיטים במאגר"""
     result = wit_app.log()
     click.echo(result)
-
+@cli.command()
+def push():
+    """Analyzes staged Python files via the CodeGuard server."""
+    result = wit_app.push()
+    click.echo(result)
 if __name__ == "__main__":
     cli()

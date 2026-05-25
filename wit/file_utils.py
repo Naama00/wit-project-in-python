@@ -37,8 +37,9 @@ class WitUtils:
         return hasher.hexdigest()
 
     @staticmethod
-    def delete_directory_contents(directory: Path):
-        """מנקה את כל התוכן של תיקייה מסוימת בלי למחוק את התיקייה עצמה."""
+    def delete_directory_contents(directory: Path) -> None:
         for item in directory.iterdir():
             if item.is_file():
                 item.unlink()
+            elif item.is_dir():
+                shutil.rmtree(item)
