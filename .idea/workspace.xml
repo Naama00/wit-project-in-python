@@ -4,32 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="708c5fee-0df5-46b7-b167-7f2f86d54141" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/sample_files/clean_code.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/sample_files/messy_code.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/wit-project-in-python.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wit-project-in-python.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.wit/references.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.wit/repository/65f6058d" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.wit/staging" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/add.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/wit/file_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_cli.py" beforeDir="false" afterPath="$PROJECT_DIR$/wit/cli.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_core.py" beforeDir="false" afterPath="$PROJECT_DIR$/wit/core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_vcs.egg-info/PKG-INFO" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_vcs.egg-info/SOURCES.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_vcs.egg-info/dependency_links.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_vcs.egg-info/entry_points.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_vcs.egg-info/requires.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit_vcs.egg-info/top_level.txt" beforeDir="false" />
-    </list>
+    <list default="true" id="708c5fee-0df5-46b7-b167-7f2f86d54141" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
