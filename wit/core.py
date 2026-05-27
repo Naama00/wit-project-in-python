@@ -74,9 +74,26 @@ class WitImplementation(WitInterface):
 
         try:
             WitUtils.copy_directory(self.staging_dir, new_commit_path)
-            metadata = f"Message: {message}\nID: {commit_id}\n"
-            (new_commit_path / "metadata.txt").write_text(metadata)
+            # חדש:
+            import json
+            from datetime import datetime
 
+            parent_id = None
+            if self.refs_path.exists():
+                content = self.refs_path.read_text()
+                if "HEAD=" in content:
+                    parent_id = content.split("HEAD=")[1].strip() or None
+
+            metadata = {
+                "id": commit_id,
+                "message": message,
+                "timestamp": datetime.now().isoformat(timespec="seconds"),
+                "parent_id": parent_id,
+            }
+            (new_commit_path / "metadata.json").write_text(
+                json.dumps(metadata, indent=2, ensure_ascii=False),
+                encoding="utf-8",
+            )
             # עדכון ה-HEAD
             self.refs_path.write_text(f"HEAD={commit_id}")
 
@@ -137,32 +154,68 @@ class WitImplementation(WitInterface):
         except Exception as e:
             return f"Checkout failed: {e}"
 
-def push(self) -> str:
-    """
-    Sends all staged Python files to the CodeGuard server for analysis.
-    Returns a summary of issues and saves generated graphs locally.
-    """
-    import requests
+    def push(self) -> str:
+        """
+        Sends all staged Python files to the CodeGuard server for analysis.
+        Returns a summary of issues and saves generated graphs locally.
+        """
+        import requests
 
-    staged_python_files = list(self.staging_dir.rglob("*.py"))
-    if not staged_python_files:
-        return "Nothing to push: no Python files in staging area."
+        staged_python_files = list(self.staging_dir.rglob("*.py"))
+        if not staged_python_files:
+            return "Nothing to push: no Python files in staging area."
 
-    server_url = self._read_server_url()   # קורא מ-.wit/config.txt
+        server_url = self._read_server_url()
 
-    try:
-        files_payload = [
-            ("files", (f.name, f.read_bytes(), "text/x-python"))
-            for f in staged_python_files
-        ]
-        response = requests.post(f"{server_url}/analyze", files=files_payload, timeout=30)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return f"Push failed: could not reach server at {server_url}. Error: {e}"
+        try:
+            files_payload = [
+                ("files", (f.name, f.read_bytes(), "text/x-python"))
+                for f in staged_python_files
+            ]
+            response = requests.post(f"{server_url}/analyze", files=files_payload, timeout=30)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            return f"Push failed: could not reach server at {server_url}. Error: {e}"
 
-    result = response.json()
-    # שמור גרפים לתיקייה מקומית
-    graphs_dir = Path.cwd() / "graphs"
-    graphs_dir.mkdir(exist_ok=True)
-    # ... הצגת תוצאות
-    return self._format_push_summary(result)
+        result = response.json()
+
+        graphs_dir = Path.cwd() / "graphs"
+        graphs_dir.mkdir(exist_ok=True)
+
+        return self._format_push_summary(result)
+
+    def _read_server_url(self) -> str:
+        """
+        Reads the server URL from .wit/config.json.
+        Falls back to localhost if the file doesn't exist.
+        """
+        import json
+        config_path = self.wit_dir / "config.json"
+        if config_path.exists():
+            try:
+                config = json.loads(config_path.read_text(encoding="utf-8"))
+                return config.get("server_url", "http://127.0.0.1:8000")
+            except (json.JSONDecodeError, KeyError):
+                pass
+        return "http://127.0.0.1:8000"
+
+    def _format_push_summary(self, result: dict) -> str:
+        """
+        Formats the JSON response from the server into a readable CLI summary.
+        """
+        lines = ["", "=== CodeGuard Analysis Results ==="]
+        for file_result in result.get("files", []):
+            lines.append(f"\n📄 {file_result['filename']}")
+            issues = file_result.get("issues", [])
+            if not issues:
+                lines.append("  ✅ No issues found.")
+            else:
+                for issue in issues:
+                    lines.append(f"  ⚠️  Line {issue['line_number']}: [{issue['issue_type']}] {issue['detail']}")
+        total = result.get("total_issues", 0)
+        graphs = result.get("graphs", [])
+        lines.append(f"\nTotal issues: {total}")
+        if graphs:
+            lines.append(f"Charts saved: {', '.join(graphs)}")
+        lines.append("==================================")
+        return "\n".join(lines)
