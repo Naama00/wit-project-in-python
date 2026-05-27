@@ -1,159 +1,83 @@
 """
-Tests for wit.core.WitImplementation
+Pydantic data models shared across the server package.
 
-Uses tmp_path (pytest built-in) so every test runs in an isolated temp directory
-with no risk of polluting the real file system.
-
-Run with:  pytest tests/test_wit_core.py -v
+Keeping models in a dedicated module avoids circular imports and gives a
+single source of truth for every API schema.
 """
 
-import os
-import pytest
-from pathlib import Path
+from __future__ import annotations
 
-from wit.core import WitImplementation
+from typing import List, Literal
 
-
-# ---------------------------------------------------------------------------
-# Fixture – isolated wit repo
-# ---------------------------------------------------------------------------
-
-@pytest.fixture
-def wit_repo(tmp_path: Path) -> WitImplementation:
-    """Creates a WitImplementation rooted in a fresh temp directory."""
-    original_cwd = Path.cwd()
-    os.chdir(tmp_path)
-    impl = WitImplementation()
-    impl.init()
-    yield impl
-    os.chdir(original_cwd)
+from pydantic import BaseModel, Field
 
 
 # ---------------------------------------------------------------------------
-# init
+# Issue types
 # ---------------------------------------------------------------------------
 
-def test_init_creates_directories(tmp_path: Path):
-    os.chdir(tmp_path)
-    impl = WitImplementation()
-    result = impl.init()
-    assert "Initialized" in result
-    assert (tmp_path / ".wit" / "staging").is_dir()
-    assert (tmp_path / ".wit" / "repository").is_dir()
-    assert (tmp_path / ".witignore").exists()
+IssueType = Literal[
+    "long_function",
+    "long_file",
+    "missing_docstring",
+    "unused_variable",
+    "non_english_variable",
+]
 
 
-def test_init_twice_returns_error(wit_repo: WitImplementation):
-    second_result = wit_repo.init()
-    assert "already exists" in second_result.lower()
+class CodeIssue(BaseModel):
+    """Represents a single code quality problem found in a file."""
 
-
-# ---------------------------------------------------------------------------
-# add
-# ---------------------------------------------------------------------------
-
-def test_add_file(wit_repo: WitImplementation, tmp_path: Path):
-    sample = tmp_path / "hello.py"
-    sample.write_text("print('hello')")
-    result = wit_repo.add("hello.py")
-    assert "Added" in result
-    assert (wit_repo.staging_dir / "hello.py").exists()
-
-
-def test_add_nonexistent_file(wit_repo: WitImplementation):
-    result = wit_repo.add("ghost.py")
-    assert "not found" in result.lower() or "Error" in result
+    function_name: str = Field(
+        description="Name of the function that contains the issue, or '<module>' for file-level issues."
+    )
+    line_number: int = Field(ge=1, description="Source line where the issue begins.")
+    issue_type: IssueType = Field(description="Machine-readable category of the issue.")
+    detail: str = Field(description="Human-readable explanation shown to the developer.")
 
 
 # ---------------------------------------------------------------------------
-# commit
+# Per-file analysis result
 # ---------------------------------------------------------------------------
 
-def test_commit_creates_commit_dir(wit_repo: WitImplementation, tmp_path: Path):
-    (tmp_path / "file.py").write_text("x = 1")
-    wit_repo.add("file.py")
-    result = wit_repo.commit("first commit")
-    assert "created successfully" in result
-    commits = list(wit_repo.repo_dir.iterdir())
-    assert len(commits) == 1
+class FileAnalysisResult(BaseModel):
+    """All analysis data collected for a single Python source file."""
 
-
-def test_commit_empty_staging_returns_error(wit_repo: WitImplementation):
-    result = wit_repo.commit("empty")
-    assert "empty" in result.lower() or "Nothing" in result
-
-
-def test_commit_clears_staging(wit_repo: WitImplementation, tmp_path: Path):
-    (tmp_path / "file.py").write_text("x = 1")
-    wit_repo.add("file.py")
-    wit_repo.commit("msg")
-    assert not any(wit_repo.staging_dir.iterdir())
-
-
-def test_commit_stores_parent_chain(wit_repo: WitImplementation, tmp_path: Path):
-    import json
-    for i in range(3):
-        (tmp_path / f"file{i}.py").write_text(f"x = {i}")
-        wit_repo.add(f"file{i}.py")
-        wit_repo.commit(f"commit {i}")
-
-    commits = sorted(wit_repo.repo_dir.iterdir())
-    assert len(commits) == 3
-
-    # Verify parent linkage
-    parent_ids = set()
-    for commit_path in commits:
-        meta = json.loads((commit_path / "metadata.json").read_text())
-        if meta["parent_id"]:
-            parent_ids.add(meta["parent_id"])
-
-    # At least two commits should have a parent
-    assert len(parent_ids) >= 1
+    filename: str
+    total_lines: int = Field(ge=0)
+    function_count: int = Field(ge=0)
+    issues: List[CodeIssue] = Field(default_factory=list)
+    function_lengths: List[int] = Field(
+        default_factory=list,
+        description="Line-count of every function, used for the histogram chart.",
+    )
+    has_non_english_variables: bool = Field(
+        default=False,
+        description="True when at least one identifier contains non-ASCII characters.",
+    )
 
 
 # ---------------------------------------------------------------------------
-# log
+# Full analysis response
 # ---------------------------------------------------------------------------
 
-def test_log_shows_commits(wit_repo: WitImplementation, tmp_path: Path):
-    (tmp_path / "a.py").write_text("a = 1")
-    wit_repo.add("a.py")
-    wit_repo.commit("the message")
-    log_output = wit_repo.log()
-    assert "the message" in log_output
+class AnalysisResponse(BaseModel):
+    """Top-level response returned by POST /analyze."""
 
-
-# ---------------------------------------------------------------------------
-# status
-# ---------------------------------------------------------------------------
-
-def test_status_shows_staged_files(wit_repo: WitImplementation, tmp_path: Path):
-    (tmp_path / "staged.py").write_text("s = 1")
-    wit_repo.add("staged.py")
-    status_output = wit_repo.status()
-    assert "staged.py" in status_output
+    files: List[FileAnalysisResult]
+    total_issues: int = Field(ge=0)
+    graphs: List[str] = Field(
+        default_factory=list,
+        description="Server-relative URLs of the generated PNG charts.",
+    )
 
 
 # ---------------------------------------------------------------------------
-# checkout
+# Alerts-only response
 # ---------------------------------------------------------------------------
 
-def test_checkout_restores_file(wit_repo: WitImplementation, tmp_path: Path):
-    original_file = tmp_path / "restore_me.py"
-    original_file.write_text("original content")
-    wit_repo.add("restore_me.py")
-    commit_result = wit_repo.commit("save original")
+class AlertsResponse(BaseModel):
+    """Lightweight response returned by POST /alerts (no charts)."""
 
-    # Extract commit id from result string
-    commit_id = commit_result.split()[1]
-
-    # Overwrite the file
-    original_file.write_text("modified content")
-
-    wit_repo.checkout(commit_id)
-    assert original_file.read_text() == "original content"
-
-
-def test_checkout_nonexistent_commit(wit_repo: WitImplementation):
-    result = wit_repo.checkout("deadbeef")
-    assert "not found" in result.lower() or "Error" in result
+    files: List[FileAnalysisResult]
+    total_issues: int = Field(ge=0)

@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-05-27T17:07:22",
+    "total_issues": 4,
+    "filenames": [
+      "test_code.py"
+    ]
+  },
+  {
+    "timestamp": "2026-05-27T17:18:57",
+    "total_issues": 1,
+    "filenames": [
+      "test_code.py"
+    ]
+  }
+]

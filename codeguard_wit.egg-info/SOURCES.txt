@@ -1,0 +1,10 @@
+README.md
+setup.py
+codeguard_wit.egg-info/PKG-INFO
+codeguard_wit.egg-info/SOURCES.txt
+codeguard_wit.egg-info/dependency_links.txt
+codeguard_wit.egg-info/entry_points.txt
+codeguard_wit.egg-info/requires.txt
+codeguard_wit.egg-info/top_level.txt
+tests/test_analyzer.py
+tests/test_wit_core.py

@@ -1,0 +1,7 @@
+click>=8.1
+requests>=2.32
+fastapi>=0.111
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pydantic>=2.7
+matplotlib>=3.9
