@@ -1,0 +1,30 @@
+# סביבה וירטואלית (Virtual Environment)
+.venv/
+venv/
+ENV/
+
+# קבצי מערכת זמניים של פייתון
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# קבצי קונפיגורציה מקומיים של פרויקט ה-VCS שלך (wit)
+.wit/
+
+# קבצי פלט וגרפים שנוצרים בזמן ריצה (כדי שלא יזהמו את המאגר)
+graphs/*.png
+!graphs/.gitkeep
+push_history.json
+
+# קבצי מערכת הפעלה וסביבות פיתוח
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+Thumbs.db
+DS_Store

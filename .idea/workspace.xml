@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="708c5fee-0df5-46b7-b167-7f2f86d54141" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/chart_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/chart_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/history_store.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/history_store.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_analyzer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/wit/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/wit/core.py" afterDir="false" />
-    </list>
+    <list default="true" id="708c5fee-0df5-46b7-b167-7f2f86d54141" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
